@@ -1,0 +1,11 @@
+{
+  "lat0_deg": 22.16,
+  "earth_radius_m": 6378137.0,
+  "airspeed_ms": 12.0,
+  "height_airspeed_ms": 7.0,
+  "min_groundspeed_ms": 3.0,
+  "power_w": 280.0,
+  "headwind_power_per_ms": 0.06,
+  "nofly_eps_m": 0.4,
+  "score": "distance_m + flight_time_s * airspeed_ms"
+}

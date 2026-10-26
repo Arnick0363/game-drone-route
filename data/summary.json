@@ -1,0 +1,62 @@
+{
+  "levels": [
+    {
+      "id": "L1",
+      "title": "路环沿岸 · 开阔空域",
+      "nofly": 1,
+      "height": 0,
+      "deliveries": 3,
+      "distance_m": 5874.6,
+      "flight_time_s": 483.0,
+      "height_m": 0.0,
+      "score": 11670.3,
+      "energy_wh": 39.58,
+      "battery_pct": 56.5,
+      "exposure_density": 5281.7,
+      "exposure_top_zone": "氹仔旧城及马场区",
+      "exposure_peak_zone": "氹仔旧城及马场区",
+      "exposure_peak_density": 3544.0,
+      "em_m": 0.0,
+      "uncovered_m": 4452.6
+    },
+    {
+      "id": "L2",
+      "title": "半岛老城 · 密集禁飞",
+      "nofly": 3,
+      "height": 0,
+      "deliveries": 5,
+      "distance_m": 6096.9,
+      "flight_time_s": 610.7,
+      "height_m": 0.0,
+      "score": 13425.1,
+      "energy_wh": 55.79,
+      "battery_pct": 58.7,
+      "exposure_density": 63128.4,
+      "exposure_top_zone": "中区",
+      "exposure_peak_zone": "下环区",
+      "exposure_peak_density": 76629.0,
+      "em_m": 0.0,
+      "uncovered_m": 151.4
+    },
+    {
+      "id": "L3",
+      "title": "离岛转运 · 净空与峡谷",
+      "nofly": 3,
+      "height": 18,
+      "deliveries": 4,
+      "distance_m": 8141.8,
+      "flight_time_s": 915.6,
+      "height_m": 809.7,
+      "score": 19129.0,
+      "energy_wh": 80.84,
+      "battery_pct": 77.0,
+      "exposure_density": 7568.0,
+      "exposure_top_zone": "北安及大潭山区",
+      "exposure_peak_zone": "氹仔中心区",
+      "exposure_peak_density": 88010.0,
+      "em_m": 175.1,
+      "uncovered_m": 5689.0
+    }
+  ],
+  "disclaimer": "禁飞区、限高区和电磁谨慎带都是教学演示近似，不是澳门法定管制空域，也不能当作飞行批准。"
+}

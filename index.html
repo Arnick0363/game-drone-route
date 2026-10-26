@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>澳门低空医疗急送航路规划</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="kicker">空间大数据 · 低空医疗急送</p>
+      <h1>澳门航路规划挑战</h1>
+    </div>
+    <p class="banner">禁飞、限高、电磁和人口数字都是教学演示，不是澳门法定管制空域，也不能当飞行批准。</p>
+    <button type="button" class="ghost" data-action="rules">评分规则</button>
+  </header>
+  <main id="stage">
+    <aside id="brief" class="panel"></aside>
+    <div id="map"></div>
+    <aside id="side" class="panel"></aside>
+  </main>
+  <section id="picker" class="picker">
+    <div class="picker-card">
+      <p class="kicker">三关，约束一层层加上</p>
+      <h2>先看地图，再画直线航线</h2>
+      <p class="lead">你是低空物流席的规划员。物资必须按顺序送到，航线不沿马路。系统用禁飞、限高、风和人口密度解释这条路为什么更短、更慢，或者干脆不能飞。</p>
+      <div id="mission-list" class="mission-list"></div>
+    </div>
+  </section>
+  <dialog id="rules">
+    <form method="dialog">
+      <h3>怎么打分</h3>
+      <table>
+        <thead><tr><th>情况</th><th>结果</th></tr></thead>
+        <tbody>
+          <tr><td>航线进入禁飞区内部</td><td>本局失败，不进成绩榜</td></tr>
+          <tr><td>只贴着禁飞区边界</td><td>不算穿越。参考航线允许贴边绕行</td></tr>
+          <tr><td>穿过限高（城市峡谷）</td><td>这一段空速按 7 m/s，不再用 12 m/s</td></tr>
+          <tr><td>风</td><td>地速 = max(3, 空速 − 逆风分量)，顺风会更快</td></tr>
+          <tr><td>综合代价</td><td>航程（米）+ 飞行时间（秒）× 12。无风且不进限高时等于航程的 2 倍</td></tr>
+          <tr><td>人口暴露、电磁谨慎带、电量、规划用时</td><td>只写进复盘，不进排行榜</td></tr>
+          <tr><td>参考航线</td><td>禁飞区顶点的可视图 + Dijkstra，边权是距离。它不主动绕限高</td></tr>
+        </tbody>
+      </table>
+      <p class="fine">点击地图加途经点，点中下一个配送点即送达，双击或按 Enter 提交。Backspace 撤销。</p>
+      <button value="close" class="primary">知道了</button>
+    </form>
+  </dialog>
+  <div id="toast" role="status"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

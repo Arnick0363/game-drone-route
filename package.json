@@ -1,0 +1,8 @@
+{
+  "name": "game-drone-route",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:js": "node tests/model.test.mjs"
+  }
+}
