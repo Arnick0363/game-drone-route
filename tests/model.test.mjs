@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { evaluateRoute } from "../js/model.js";
+import { detectionAt, evaluateRoute, routeDetection } from "../js/model.js";
 
 const payload = JSON.parse(readFileSync(new URL("../data/fixtures/geometry_cases.json", import.meta.url), "utf8"));
 
@@ -25,6 +25,35 @@ for (const item of payload.cases) {
     }
   });
 }
+
+test("detection kernel is one at the camera and fades with distance", () => {
+  const model = payload.model;
+  const sites = [{ lon: 113.54, lat: 22.16, risk: 2 }];
+  assert.ok(Math.abs(detectionAt(113.54, 22.16, sites, 450, model) - 2) < 1e-9);
+  const away = detectionAt(113.55, 22.16, sites, 450, model);
+  assert.ok(away < 2);
+  assert.ok(away > 0);
+  const route = routeDetection([[113.54, 22.16], [113.541, 22.16]], sites, 450, model);
+  assert.ok(route > 0);
+  assert.ok(route < 2);
+});
+
+test("stored routes keep a finite detection density", () => {
+  const cost = JSON.parse(readFileSync(new URL("../data/cost_model.json", import.meta.url), "utf8"));
+  const perception = JSON.parse(readFileSync(new URL("../data/perception.json", import.meta.url), "utf8"));
+  assert.equal(perception.status, "ok");
+  assert.ok(perception.sites.every((site) => Array.isArray(site.boxes)));
+  for (const id of ["L1", "L2", "L3"]) {
+    const learned = cost.levels[id].learned;
+    const distance = cost.levels[id].distance;
+    assert.ok(learned.path.length >= 2);
+    assert.ok(distance.path.length >= 2);
+    assert.equal(typeof learned.metrics.detect_density, "number");
+    assert.ok(Number.isFinite(learned.metrics.score));
+  }
+  const jsDensity = routeDetection(cost.levels.L2.distance.path, perception.sites, cost.sigma_m);
+  assert.ok(Math.abs(jsDensity - cost.levels.L2.distance.metrics.detect_density) < 0.02);
+});
 
 test("real baseline stays close to the python score", () => {
   const baseline = JSON.parse(readFileSync(new URL("../data/baseline.json", import.meta.url), "utf8"));

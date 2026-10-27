@@ -22,6 +22,44 @@ export function windVector(fromDeg, speed) {
   return [speed * Math.sin(to), speed * Math.cos(to)];
 }
 
+export function unproject(x, y, model = FALLBACK_MODEL) {
+  const lat0 = (model.lat0_deg * Math.PI) / 180;
+  const radius = model.earth_radius_m;
+  return [(x / (radius * Math.cos(lat0))) * 180 / Math.PI, (y / radius) * 180 / Math.PI];
+}
+
+export function detectionAt(lon, lat, sites, sigma, model = FALLBACK_MODEL) {
+  if (!sites || !sites.length || !(sigma > 0)) return 0;
+  const [x, y] = project(lon, lat, model);
+  let total = 0;
+  for (const site of sites) {
+    const [sx, sy] = project(site.lon, site.lat, model);
+    const distance = Math.hypot(x - sx, y - sy);
+    total += Number(site.risk || 0) * Math.exp(-distance / sigma);
+  }
+  return total;
+}
+
+export function routeDetection(route, sites, sigma, model = FALLBACK_MODEL) {
+  if (!route || route.length < 2 || !sites || !sites.length) return 0;
+  let weighted = 0;
+  let length = 0;
+  for (let index = 0; index < route.length - 1; index += 1) {
+    const a = project(route[index][0], route[index][1], model);
+    const b = project(route[index + 1][0], route[index + 1][1], model);
+    const segment = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (segment < 1e-6) continue;
+    let local = 0;
+    for (const fraction of [0.25, 0.5, 0.75]) {
+      const [lon, lat] = unproject(a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction, model);
+      local += detectionAt(lon, lat, sites, sigma, model);
+    }
+    weighted += segment * (local / 3);
+    length += segment;
+  }
+  return length > 0 ? weighted / length : 0;
+}
+
 function hypot(dx, dy) {
   return Math.hypot(dx, dy);
 }

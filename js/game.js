@@ -1,10 +1,12 @@
-import { evaluateRoute, explain, formatDuration, formatMeters } from "./model.js";
+import { evaluateRoute, explain, formatDuration, formatMeters, routeDetection } from "./model.js";
 
 const BOARD_KEY = "g2-macau-drone-board-v1";
 const state = {
   model: null,
   population: [],
   baseline: null,
+  perception: null,
+  costModel: null,
   levels: [],
   level: null,
   phase: "pick",
@@ -15,6 +17,16 @@ const state = {
   callsign: "规划员",
   player: null,
   ai: null,
+  learned: null,
+  layerOn: {
+    nofly: true,
+    height: true,
+    population: true,
+    wind: true,
+    detect: true,
+    compare: true,
+    em: true,
+  },
 };
 
 const layers = {};
@@ -50,6 +62,14 @@ document.addEventListener("input", (event) => {
   if (event.target.id === "callsign") state.callsign = event.target.value.trim() || "规划员";
 });
 
+document.addEventListener("change", (event) => {
+  const input = event.target.closest("[data-layer]");
+  if (!input) return;
+  state.layerOn[input.dataset.layer] = input.checked;
+  if (input.dataset.layer === "compare") drawCompare();
+  applyLayers();
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.target.matches("input, textarea")) return;
   if (event.key === "Backspace") {
@@ -64,10 +84,12 @@ init().catch((error) => {
 });
 
 async function init() {
-  const [model, populationFile, baseline, l1, l2, l3] = await Promise.all([
+  const [model, populationFile, baseline, perception, costModel, l1, l2, l3] = await Promise.all([
     loadJson("data/model.json"),
     loadJson("data/population.json"),
     loadJson("data/baseline.json"),
+    loadOptional("data/perception.json"),
+    loadOptional("data/cost_model.json"),
     loadJson("data/levels/l1.json"),
     loadJson("data/levels/l2.json"),
     loadJson("data/levels/l3.json"),
@@ -75,6 +97,8 @@ async function init() {
   state.model = model;
   state.population = populationFile.zones;
   state.baseline = baseline;
+  state.perception = perception;
+  state.costModel = costModel;
   state.levels = [l1, l2, l3];
   missionEl.innerHTML = state.levels.map(missionCard).join("");
   map = L.map("map", { zoomControl: false, doubleClickZoom: false }).setView([22.16, 113.56], 13);
@@ -88,6 +112,9 @@ async function init() {
   layers.em = L.layerGroup().addTo(map);
   layers.height = L.layerGroup().addTo(map);
   layers.nofly = L.layerGroup().addTo(map);
+  layers.wind = L.layerGroup().addTo(map);
+  layers.detect = L.layerGroup().addTo(map);
+  layers.compare = L.layerGroup().addTo(map);
   layers.route = L.layerGroup().addTo(map);
   layers.markers = L.layerGroup().addTo(map);
   layers.cursor = L.polyline([], { color: "#0f5f5a", weight: 2, dashArray: "4 6", interactive: false }).addTo(map);
@@ -109,6 +136,16 @@ async function loadJson(url) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(url);
   return response.json();
+}
+
+async function loadOptional(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    return response.json();
+  } catch {
+    return null;
+  }
 }
 
 function missionCard(level) {
@@ -133,7 +170,9 @@ function openLevel(id) {
   state.delivered = 0;
   state.player = null;
   state.ai = null;
+  state.learned = null;
   state.planningS = 0;
+  state.layerOn.compare = true;
   pickerEl.classList.add("hidden");
   drawLevel();
   render();
@@ -157,8 +196,12 @@ function startPlanning() {
   state.startedAt = Date.now();
   state.player = null;
   state.ai = null;
+  state.learned = null;
+  state.layerOn.compare = false;
   render();
   drawRoute();
+  drawCompare();
+  applyLayers();
 }
 
 function retry() {
@@ -168,8 +211,12 @@ function retry() {
   state.delivered = 0;
   state.player = null;
   state.ai = null;
+  state.learned = null;
+  state.layerOn.compare = true;
   render();
   drawRoute();
+  drawCompare();
+  applyLayers();
 }
 
 function onClick(event) {
@@ -258,11 +305,16 @@ function submit() {
   state.phase = "review";
   const route = state.points.map((point) => [point.lon, point.lat]);
   state.player = evaluateRoute(route, context(level));
-  state.ai = evaluateRoute(state.baseline.levels[level.id].path, context(level));
+  const distancePath = state.costModel?.levels?.[level.id]?.distance?.path || state.baseline.levels[level.id].path;
+  state.ai = evaluateRoute(distancePath, context(level));
+  state.learned = state.costModel?.levels?.[level.id]?.learned || null;
+  state.layerOn.compare = true;
   if (state.player.legal) remember(level, state.player);
   layers.cursor.setLatLngs([]);
   render();
   drawRoute();
+  drawCompare();
+  applyLayers();
 }
 
 function context(level) {
@@ -348,12 +400,19 @@ function render() {
     <label class="fine">成绩榜代号
       <input id="callsign" class="callsign" value="${esc(state.callsign)}" maxlength="12" />
     </label>
+    <h3 style="margin-top:14px;font-size:14px">图层</h3>
+    ${layerToggles()}
     <div class="legend">
       <span><i class="swatch" style="background:#b42318"></i>禁飞</span>
       <span><i class="swatch" style="background:#d97706"></i>限高</span>
       <span><i class="swatch" style="background:#6d5bd0"></i>电磁谨慎</span>
       <span><i class="swatch" style="background:#7a1f1f"></i>高人口密度</span>
+      <span><i class="swatch" style="background:#db2777"></i>检测样本</span>
+      <span><i class="swatch" style="background:#334155"></i>距离最短</span>
+      <span><i class="swatch" style="background:#c2410c"></i>学习代价</span>
     </div>
+    ${modelCard()}
+    ${routeCompare()}
     <h3 style="margin-top:14px;font-size:14px">本关成绩榜</h3>
     <p class="fine">只记录成功局，代价越低越好。存在这台浏览器里。</p>
     ${boardTable(level.id)}
@@ -365,27 +424,83 @@ function reviewBlock() {
   const player = state.player;
   const ai = state.ai;
   const lines = explain(player, ai).map((line) => `<p>${esc(line)}</p>`).join("");
+  const learned = state.learned?.metrics;
   return `<div class="debrief">
     <h3>${player.legal ? "这趟可以飞" : "这趟不能飞"}</h3>
     <table class="compare">
-      <thead><tr><th></th><th>你</th><th>参考</th></tr></thead>
+      <thead><tr><th></th><th>你</th><th>距离最短</th><th>学习代价</th></tr></thead>
       <tbody>
-        ${row("航程", formatMeters(player.distance_m), formatMeters(ai.distance_m))}
-        ${row("飞行时间", formatDuration(player.flight_time_s), formatDuration(ai.flight_time_s))}
-        ${row("限高段", formatMeters(player.height_m), formatMeters(ai.height_m))}
-        ${row("综合代价", scoreText(player), scoreText(ai))}
-        ${row("人口加权", densityText(player), densityText(ai))}
-        ${row("电磁段", formatMeters(player.em_m), formatMeters(ai.em_m))}
-        ${row("估算耗电", `${player.energy_wh.toFixed(1)} Wh`, `${ai.energy_wh.toFixed(1)} Wh`)}
+        ${row3("航程", formatMeters(player.distance_m), formatMeters(ai.distance_m), learned ? formatMeters(learned.distance_m) : "—")}
+        ${row3("飞行时间", formatDuration(player.flight_time_s), formatDuration(ai.flight_time_s), learned ? formatDuration(learned.flight_time_s) : "—")}
+        ${row3("限高段", formatMeters(player.height_m), formatMeters(ai.height_m), learned ? formatMeters(learned.height_m) : "—")}
+        ${row3("综合代价", scoreText(player), scoreText(ai), learned && learned.legal ? Math.round(learned.score).toLocaleString("zh-CN") : "—")}
+        ${row3("人口加权", densityText(player), densityText(ai), learned && learned.exposure_density != null ? String(Math.round(learned.exposure_density)) : "—")}
+        ${row3("检测密度", detectText(playerDetect()), detectText(state.costModel?.levels?.[state.level.id]?.distance?.metrics?.detect_density), detectText(learned?.detect_density))}
       </tbody>
     </table>
     ${lines}
-    <p class="fine">规划用时 ${formatDuration(state.planningS)}，不在综合代价里。参考航线是禁飞约束下的最短路。</p>
+    ${state.costModel?.levels?.[state.level.id]?.note ? `<p>${esc(state.costModel.levels[state.level.id].note)}</p>` : ""}
+    <p class="fine">规划用时 ${formatDuration(state.planningS)}，不进综合代价。距离最短路只最小化米数。学习代价路把梯度提升树的预测值当作边权。</p>
   </div>`;
 }
 
-function row(label, left, right) {
-  return `<tr><td>${label}</td><td>${left}</td><td>${right}</td></tr>`;
+function row3(label, player, distance, learned) {
+  return `<tr><td>${label}</td><td>${player}</td><td>${distance}</td><td>${learned}</td></tr>`;
+}
+
+function playerDetect() {
+  if (!state.player || !state.points.length) return null;
+  return routeDetection(state.points.map((point) => [point.lon, point.lat]), state.perception?.sites || [], state.costModel?.sigma_m || state.perception?.sigma_m || 450, state.model);
+}
+
+function detectText(value) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return Number(value).toFixed(3);
+}
+
+function layerToggles() {
+  const items = [
+    ["nofly", "禁飞"],
+    ["height", "限高"],
+    ["population", "人口"],
+    ["wind", "风"],
+    ["detect", "检测风险"],
+    ["compare", "对比航线"],
+    ["em", "电磁"],
+  ];
+  return `<div class="layers">${items.map(([key, label]) => `<label><input type="checkbox" data-layer="${key}" ${state.layerOn[key] ? "checked" : ""}/>${label}</label>`).join("")}</div>`;
+}
+
+function modelCard() {
+  const model = state.costModel;
+  if (!model?.gbdt) return `<p class="fine">代价模型还没有生成。先运行 scripts/learn_cost.py。</p>`;
+  const ranked = Object.entries(model.gbdt.importance).sort((left, right) => right[1] - left[1]);
+  const top = ranked[0];
+  const topName = model.feature_names_zh?.[top[0]] || top[0];
+  const chart = model.chart ? `<img class="fit-chart" src="${esc(model.chart)}" alt="留出集上预测代价和教学标签的散点" />` : "";
+  return `<div class="model-card">
+    <h3>教学代价模型</h3>
+    <p class="fine">梯度提升树留出集 MAE ${model.gbdt.mae.toFixed(1)}，R² ${model.gbdt.r2.toFixed(3)}，排序相关 ${model.gbdt.spearman.toFixed(3)}。样本 ${model.n}，其中 ${model.n_test} 条留出。最重要的特征是${esc(topName)}。</p>
+    <p class="fine">线性回归对照 MAE ${model.linear.mae.toFixed(1)}，R² ${model.linear.r2.toFixed(3)}。寻路用树，不用这条直线。</p>
+    ${chart}
+  </div>`;
+}
+
+function routeCompare() {
+  const item = state.costModel?.levels?.[state.level?.id];
+  if (!item) return "";
+  const distance = item.distance.metrics;
+  const learned = item.learned.metrics;
+  return `<table class="compare">
+    <thead><tr><th></th><th>距离最短</th><th>学习代价</th></tr></thead>
+    <tbody>
+      <tr><td>航程</td><td>${formatMeters(distance.distance_m)}</td><td>${formatMeters(learned.distance_m)}</td></tr>
+      <tr><td>综合代价</td><td>${Math.round(distance.score).toLocaleString("zh-CN")}</td><td>${Math.round(learned.score).toLocaleString("zh-CN")}</td></tr>
+      <tr><td>限高段</td><td>${formatMeters(distance.height_m)}</td><td>${formatMeters(learned.height_m)}</td></tr>
+      <tr><td>检测密度</td><td>${detectText(distance.detect_density)}</td><td>${detectText(learned.detect_density)}</td></tr>
+    </tbody>
+  </table>
+  <p class="fine">${esc(item.note)}</p>`;
 }
 
 function nextLevelButton() {
@@ -450,6 +565,10 @@ function drawLevel() {
   drawPolygons(layers.em, level.em, { color: "#6d5bd0", weight: 1, fillColor: "#6d5bd0", fillOpacity: 0.12 });
   drawPolygons(layers.height, level.height, { color: "#b54708", weight: 1, fillColor: "#f59e0b", fillOpacity: 0.32 });
   drawPolygons(layers.nofly, level.nofly, { color: "#9b1c1c", weight: 1.4, fillColor: "#b42318", fillOpacity: 0.38 });
+  drawWind();
+  drawDetect();
+  drawCompare();
+  applyLayers();
   drawMarkers();
   drawRoute();
 }
@@ -500,9 +619,89 @@ function drawRoute() {
       : null);
     if (result) paintSegments(result, latlngs);
   }
-  if (state.phase === "review" && state.baseline) {
-    const ai = state.baseline.levels[state.level.id].path.map(([lon, lat]) => [lat, lon]);
-    layers.route.addLayer(L.polyline(ai, { color: "#334155", weight: 3, dashArray: "8 7", interactive: false }));
+  if (state.phase === "review") drawCompare();
+}
+
+function drawCompare() {
+  if (!layers.compare) return;
+  layers.compare.clearLayers();
+  const item = state.costModel?.levels?.[state.level?.id];
+  if (!item) return;
+  const distance = item.distance.path.map(([lon, lat]) => [lat, lon]);
+  const learned = item.learned.path.map(([lon, lat]) => [lat, lon]);
+  layers.compare.addLayer(L.polyline(distance, { color: "#334155", weight: 3, dashArray: "8 7", interactive: false }));
+  layers.compare.addLayer(L.polyline(learned, { color: "#c2410c", weight: 4, interactive: false }));
+}
+
+function drawWind() {
+  layers.wind.clearLayers();
+  const level = state.level;
+  if (!level) return;
+  const bearing = (Number(level.wind.from_deg) + 180) % 360;
+  const icon = L.divIcon({
+    className: "",
+    html: `<div class="wind-pin"><b style="transform:rotate(${bearing}deg)">▲</b><em>${level.wind.speed_ms}</em></div>`,
+    iconSize: [54, 28],
+    iconAnchor: [14, 14],
+  });
+  const bounds = levelBounds(level);
+  const center = bounds.getCenter();
+  layers.wind.addLayer(L.marker(center, { icon, interactive: false, zIndexOffset: 300 }));
+  layers.wind.addLayer(L.marker([level.vertiport.lat, level.vertiport.lon], { icon, interactive: false, zIndexOffset: 300 }));
+}
+
+function drawDetect() {
+  layers.detect.clearLayers();
+  const sites = state.perception?.status === "ok" ? state.perception.sites || [] : [];
+  const level = state.level;
+  if (!level || !sites.length) return;
+  const bounds = levelBounds(level).pad(0.6);
+  for (const site of sites) {
+    if (!bounds.contains([site.lat, site.lon])) continue;
+    const marker = L.circleMarker([site.lat, site.lon], {
+      radius: 7 + Math.min(Number(site.risk) || 0, 8),
+      color: "#9d174d",
+      weight: 1,
+      fillColor: "#db2777",
+      fillOpacity: 0.5,
+    });
+    marker.bindTooltip(detectTip(site), { sticky: true });
+    layers.detect.addLayer(marker);
+  }
+}
+
+function detectTip(site) {
+  const names = {
+    person: "人", bicycle: "自行车", car: "汽车", motorcycle: "摩托车", bus: "公交",
+    truck: "卡车", bird: "鸟", airplane: "飞机", boat: "船", "traffic light": "信号灯", "stop sign": "停车标志",
+  };
+  const counts = {};
+  for (const box of site.boxes || []) {
+    const label = names[box.cls] || box.cls;
+    counts[label] = (counts[label] || 0) + 1;
+  }
+  const summary = Object.entries(counts).map(([label, count]) => `${label} ${count}`).join("、") || "没有计入风险的目标";
+  const credit = site.license ? ` ${site.license}` : "";
+  return `${site.title}：${summary}。风险 ${Number(site.risk).toFixed(2)}。${credit}`;
+}
+
+function applyLayers() {
+  const groups = [
+    ["population", layers.population],
+    ["em", layers.em],
+    ["height", layers.height],
+    ["nofly", layers.nofly],
+    ["wind", layers.wind],
+    ["detect", layers.detect],
+    ["compare", layers.compare],
+  ];
+  for (const [name, group] of groups) {
+    if (!group || !map) continue;
+    if (state.layerOn[name]) {
+      if (!map.hasLayer(group)) group.addTo(map);
+    } else if (map.hasLayer(group)) {
+      map.removeLayer(group);
+    }
   }
 }
 
@@ -521,6 +720,9 @@ function clearDrawings() {
   layers.em.clearLayers();
   layers.height.clearLayers();
   layers.nofly.clearLayers();
+  layers.wind.clearLayers();
+  layers.detect.clearLayers();
+  layers.compare.clearLayers();
   layers.route.clearLayers();
   layers.markers.clearLayers();
   layers.cursor.setLatLngs([]);

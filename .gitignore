@@ -5,3 +5,5 @@ __pycache__/
 .pytest_cache/
 .env
 .DS_Store
+data/raw/weights/
+*.pt

@@ -28,7 +28,9 @@
 python -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
 .\.venv\Scripts\python scripts\build_all.py
-.\.venv\Scripts\python -m unittest tests.test_planning
+.\.venv\Scripts\python scripts\perceive.py
+.\.venv\Scripts\python scripts\learn_cost.py
+.\.venv\Scripts\python -m unittest tests.test_planning tests.test_cost
 node tests/model.test.mjs
 .\.venv\Scripts\python -m http.server 8765
 ```
@@ -70,6 +72,22 @@ node tests/model.test.mjs
 离岛参考航线有 810 米在城市峡谷里。限高空速 7 m/s、区外 12 m/s 时，这段大约多 48 秒，折合综合代价约 580。绕路若明显短于这个当量，代价会更低；参考航线故意不优化这一点，用来和「只求最短」对照。它还有约 175 米进入跑道外侧的电磁谨慎带，但不进入跑道禁飞区。按 280 W 估算，这一关参考航线耗电约 81 Wh，占演示电池 105 Wh 的 77%。
 
 前端用同一套公式重算参考航线，与 Python 的综合代价相差在 1% 以内（`tests/model.test.mjs`）。
+
+## 感知层和教学代价
+
+距离最短路仍然只绕禁飞。另一条路把梯度提升树的预测值当成有向边权。标签是原来的综合代价，再加检测密度乘 80 米、转角乘 0.35 米。这是教学实验：6393 条边都由公式生成，不是飞行记录。留出 1279 条。梯度提升树 MAE 59.13、R² 0.9982、Spearman 0.9975；同一批样本上的线性回归 MAE 183.13、R² 0.9801、Spearman 0.9906。特征重要性里航段长度占 0.9645，风向夹角 0.0329，检测密度只有 0.0012。
+
+感知用 Ultralytics YOLO11n，输入边长 640、CPU、置信度 0.25。权重是 COCO nano 预训练，不是澳门航拍，也没有沿用木材节疤那次训练的指标。本次推理 9 张公开照片、45 个框，风险和 18.40。路环 6 张来自 Commons 地理搜索；议事亭前地两张和威尼斯人东大堂一张来自文件页上的相机坐标，因为查询接口曾经返回 429。框留在照片像素里，地图上只有拍摄点。
+
+| 关卡 | 距离最短 | 学习代价路 | 航程差 | 综合代价差 | 限高差 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 路环沿岸 | 5.87 km / 11,670 | 5.87 km / 11,674 | 0.04 m | +4 | 0 |
+| 半岛老城 | 6.10 km / 13,425 | 6.12 km / 13,475 | +21 m | +50 | 0 |
+| 离岛转运 | 8.14 km / 19,129 | 8.23 km / 18,801 | +88 m | −328 | −255 m |
+
+离岛这一对折线相距最远约 455 米。学习代价路多飞 88 米，限高段从 810 米降到 555 米，飞行时间从 916 秒降到 881 秒。它换来的综合代价更低，但长度加权人口密度从 7,568 升到 29,057：绕峡谷时飞进了更密的普查分区，而人口密度几乎不进树的分裂。
+
+做法和没借用的仓库写在 `docs/interview-brief.md`。散点图在 `assets/cost-fit.png`。
 
 ## 设计理念
 

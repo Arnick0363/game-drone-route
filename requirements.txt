@@ -2,3 +2,6 @@ shapely==2.2.0
 networkx==3.7
 numpy==2.5.4
 pyproj==3.8.0
+scikit-learn==1.9.1
+ultralytics==8.4.190
+matplotlib==3.11.2

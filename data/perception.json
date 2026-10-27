@@ -1,0 +1,643 @@
+{
+  "status": "ok",
+  "reason": null,
+  "model": "yolo11n",
+  "imgsz": 640,
+  "device": "cpu",
+  "conf": 0.25,
+  "weights_source": "data/raw/weights/yolo11n.pt，来自 Ultralytics 发布的 COCO nano 权重，本地复用",
+  "image_source": "Wikimedia Commons geosearch，半径 1500 米；另加三张文件页上带相机坐标的照片（议事亭前地两张、威尼斯人东大堂一张）。",
+  "sigma_m": 450.0,
+  "class_weights": {
+    "person": 1.0,
+    "bicycle": 0.6,
+    "car": 0.8,
+    "motorcycle": 0.7,
+    "bus": 1.0,
+    "truck": 1.0,
+    "bird": 1.2,
+    "airplane": 1.5,
+    "boat": 0.5,
+    "traffic light": 0.3,
+    "stop sign": 0.3
+  },
+  "limitation": "权重是 COCO 预训练的 YOLO11n，不是用澳门航拍训出来的。框在照片像素里，地图上只保留拍摄点坐标和风险和。",
+  "borrowed_from": "https://github.com/adeelshah110/Yolo11_Wood_Surfaces/blob/master/Yolo_v1.ipynb",
+  "sites": [
+    {
+      "title": "File:Avenida de Cinco de Outubro corridor 10-02-2023.jpg",
+      "lat": 22.117925,
+      "lon": 113.551078,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Avenida_de_Cinco_de_Outubro_corridor_10-02-2023.jpg/960px-Avenida_de_Cinco_de_Outubro_corridor_10-02-2023.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Avenida_de_Cinco_de_Outubro_corridor_10-02-2023.jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "LN9267",
+      "attribution": "",
+      "file": "site_01.jpg",
+      "level_hint": "L1",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "person",
+          "conf": 0.6998,
+          "xyxy": [
+            91.0,
+            406.5,
+            194.9,
+            548.6
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.6824,
+          "xyxy": [
+            161.1,
+            358.6,
+            216.5,
+            516.0
+          ]
+        },
+        {
+          "cls": "bench",
+          "conf": 0.6401,
+          "xyxy": [
+            69.5,
+            456.5,
+            157.8,
+            557.6
+          ]
+        },
+        {
+          "cls": "boat",
+          "conf": 0.4535,
+          "xyxy": [
+            523.2,
+            188.6,
+            813.3,
+            512.2
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3985,
+          "xyxy": [
+            207.9,
+            359.3,
+            228.7,
+            416.7
+          ]
+        },
+        {
+          "cls": "car",
+          "conf": 0.3749,
+          "xyxy": [
+            0.1,
+            427.9,
+            67.8,
+            513.3
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.2511,
+          "xyxy": [
+            602.3,
+            362.6,
+            621.0,
+            405.9
+          ]
+        }
+      ],
+      "risk": 2.5585
+    },
+    {
+      "title": "File:Zhuhai views from Avenida de Cinco de Outubro 10-02-2023(1).jpg",
+      "lat": 22.117925,
+      "lon": 113.551078,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Zhuhai_views_from_Avenida_de_Cinco_de_Outubro_10-02-2023%281%29.jpg/960px-Zhuhai_views_from_Avenida_de_Cinco_de_Outubro_10-02-2023%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Zhuhai_views_from_Avenida_de_Cinco_de_Outubro_10-02-2023(1).jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "LN9267",
+      "attribution": "",
+      "file": "site_02.jpg",
+      "level_hint": "L1",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "boat",
+          "conf": 0.6427,
+          "xyxy": [
+            73.1,
+            407.0,
+            206.8,
+            448.4
+          ]
+        },
+        {
+          "cls": "boat",
+          "conf": 0.2912,
+          "xyxy": [
+            740.5,
+            425.3,
+            809.7,
+            447.8
+          ]
+        },
+        {
+          "cls": "boat",
+          "conf": 0.282,
+          "xyxy": [
+            257.5,
+            401.9,
+            390.6,
+            445.3
+          ]
+        }
+      ],
+      "risk": 0.6079
+    },
+    {
+      "title": "File:E2210 TCM 21A 20-06-2025.jpg",
+      "lat": 22.118017,
+      "lon": 113.551308,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/E2210_TCM_21A_20-06-2025.jpg/960px-E2210_TCM_21A_20-06-2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page_url": "https://commons.wikimedia.org/wiki/File:E2210_TCM_21A_20-06-2025.jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "LN9267",
+      "attribution": "",
+      "file": "site_03.jpg",
+      "level_hint": "L1",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "bus",
+          "conf": 0.9596,
+          "xyxy": [
+            99.9,
+            211.4,
+            721.3,
+            589.2
+          ]
+        },
+        {
+          "cls": "car",
+          "conf": 0.6016,
+          "xyxy": [
+            0.1,
+            394.9,
+            43.8,
+            453.8
+          ]
+        }
+      ],
+      "risk": 1.4409
+    },
+    {
+      "title": "File:Estabelecimento de Comidas Loja De Sopa De Fitas De Cais Coloane noodles 24-01-2025.jpg",
+      "lat": 22.118083,
+      "lon": 113.551247,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Estabelecimento_de_Comidas_Loja_De_Sopa_De_Fitas_De_Cais_Coloane_noodles_24-01-2025.jpg/960px-Estabelecimento_de_Comidas_Loja_De_Sopa_De_Fitas_De_Cais_Coloane_noodles_24-01-2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Estabelecimento_de_Comidas_Loja_De_Sopa_De_Fitas_De_Cais_Coloane_noodles_24-01-2025.jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "LN9267",
+      "attribution": "",
+      "file": "site_04.jpg",
+      "level_hint": "L1",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "bowl",
+          "conf": 0.4771,
+          "xyxy": [
+            36.6,
+            140.6,
+            640.9,
+            616.3
+          ]
+        },
+        {
+          "cls": "dining table",
+          "conf": 0.2704,
+          "xyxy": [
+            8.8,
+            4.1,
+            956.4,
+            717.7
+          ]
+        }
+      ],
+      "risk": 0.0
+    },
+    {
+      "title": "File:Coloane Lord Stow's Bakery 01-11-2024(1).jpg",
+      "lat": 22.118081,
+      "lon": 113.551269,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Coloane_Lord_Stow%27s_Bakery_01-11-2024%281%29.jpg/960px-Coloane_Lord_Stow%27s_Bakery_01-11-2024%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coloane_Lord_Stow%27s_Bakery_01-11-2024(1).jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "LN9267",
+      "attribution": "",
+      "file": "site_05.jpg",
+      "level_hint": "L1",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "person",
+          "conf": 0.8909,
+          "xyxy": [
+            737.2,
+            369.5,
+            847.7,
+            647.9
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.7849,
+          "xyxy": [
+            474.5,
+            408.5,
+            537.6,
+            625.5
+          ]
+        },
+        {
+          "cls": "potted plant",
+          "conf": 0.6469,
+          "xyxy": [
+            910.9,
+            392.3,
+            959.7,
+            454.8
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.4492,
+          "xyxy": [
+            441.0,
+            408.9,
+            482.6,
+            540.0
+          ]
+        }
+      ],
+      "risk": 2.125
+    },
+    {
+      "title": "File:Coloane Village restaurant 10-02-2023(1).jpg",
+      "lat": 22.117778,
+      "lon": 113.551133,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Coloane_Village_restaurant_10-02-2023%281%29.jpg/960px-Coloane_Village_restaurant_10-02-2023%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coloane_Village_restaurant_10-02-2023(1).jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "LN9267",
+      "attribution": "",
+      "file": "site_06.jpg",
+      "level_hint": "L1",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "car",
+          "conf": 0.3901,
+          "xyxy": [
+            0.6,
+            677.9,
+            51.6,
+            719.7
+          ]
+        },
+        {
+          "cls": "potted plant",
+          "conf": 0.3705,
+          "xyxy": [
+            564.2,
+            453.4,
+            637.4,
+            569.0
+          ]
+        },
+        {
+          "cls": "potted plant",
+          "conf": 0.2994,
+          "xyxy": [
+            328.4,
+            422.5,
+            413.0,
+            551.7
+          ]
+        },
+        {
+          "cls": "potted plant",
+          "conf": 0.255,
+          "xyxy": [
+            308.3,
+            509.3,
+            345.3,
+            572.9
+          ]
+        }
+      ],
+      "risk": 0.3121
+    },
+    {
+      "title": "File:Macau - Senado Square.jpg",
+      "lat": 22.1933948435,
+      "lon": 113.5397222824,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Macau_-_Senado_Square.jpg/960px-Macau_-_Senado_Square.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Macau_-_Senado_Square.jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY 2.0",
+      "artist": "Tristan Schmurr (kewl)",
+      "attribution": "kewl, CC BY 2.0, via Wikimedia Commons",
+      "file": "senado_a.jpg",
+      "scene": "街景。文件页 GPS 约海拔 10 米。",
+      "level_hint": "L2",
+      "width": 960,
+      "height": 641,
+      "boxes": [
+        {
+          "cls": "potted plant",
+          "conf": 0.7805,
+          "xyxy": [
+            0.2,
+            217.7,
+            53.6,
+            337.2
+          ]
+        }
+      ],
+      "risk": 0.0
+    },
+    {
+      "title": "File:Largo do Senado 1110301.jpg",
+      "lat": 22.19367777777778,
+      "lon": 113.53996944444444,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Largo_do_Senado_1110301.jpg/960px-Largo_do_Senado_1110301.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Largo_do_Senado_1110301.jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY-SA 4.0",
+      "artist": "K.Y.K.Z.K.",
+      "attribution": "K.Y.K.Z.K., CC BY-SA 4.0, via Wikimedia Commons",
+      "file": "senado_b.jpg",
+      "scene": "街景。文件页 GPS 约海拔 5 米。",
+      "level_hint": "L2",
+      "width": 960,
+      "height": 718,
+      "boxes": [
+        {
+          "cls": "person",
+          "conf": 0.8205,
+          "xyxy": [
+            916.7,
+            379.6,
+            949.1,
+            473.8
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.7877,
+          "xyxy": [
+            329.0,
+            375.5,
+            383.6,
+            506.2
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.7456,
+          "xyxy": [
+            675.4,
+            391.0,
+            722.1,
+            508.5
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.7445,
+          "xyxy": [
+            866.7,
+            387.6,
+            901.2,
+            476.6
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.7202,
+          "xyxy": [
+            822.1,
+            393.2,
+            860.1,
+            475.5
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.6925,
+          "xyxy": [
+            21.0,
+            392.1,
+            67.2,
+            502.4
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.5495,
+          "xyxy": [
+            751.0,
+            385.3,
+            771.9,
+            434.8
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.4204,
+          "xyxy": [
+            642.2,
+            381.3,
+            658.9,
+            423.2
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3967,
+          "xyxy": [
+            775.3,
+            384.5,
+            792.5,
+            424.6
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3875,
+          "xyxy": [
+            12.7,
+            395.0,
+            34.0,
+            499.6
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3571,
+          "xyxy": [
+            627.4,
+            384.0,
+            641.2,
+            427.0
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.2676,
+          "xyxy": [
+            13.7,
+            391.0,
+            55.7,
+            501.9
+          ]
+        }
+      ],
+      "risk": 6.8898
+    },
+    {
+      "title": "File:East Lobby Venetian Macau 澳門威尼斯人東大堂 - panoramio.jpg",
+      "lat": 22.148216666666666,
+      "lon": 113.56173888888888,
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/East_Lobby_Venetian_Macau_%E6%BE%B3%E9%96%80%E5%A8%81%E5%B0%BC%E6%96%AF%E4%BA%BA%E6%9D%B1%E5%A4%A7%E5%A0%82_-_panoramio.jpg/960px-East_Lobby_Venetian_Macau_%E6%BE%B3%E9%96%80%E5%A8%81%E5%B0%BC%E6%96%AF%E4%BA%BA%E6%9D%B1%E5%A4%A7%E5%A0%82_-_panoramio.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:East_Lobby_Venetian_Macau_%E6%BE%B3%E9%96%80%E5%A8%81%E5%B0%BC%E6%96%AF%E4%BA%BA%E6%9D%B1%E5%A4%A7%E5%A0%82_-_panoramio.jpg",
+      "mime": "image/jpeg",
+      "license": "CC BY 3.0",
+      "artist": "lienyuan lee",
+      "attribution": "lienyuan lee, CC BY 3.0, via Wikimedia Commons",
+      "file": "venetian.jpg",
+      "scene": "威尼斯人东大堂室内，不是低空航拍。坐标是文件页上的相机位置。",
+      "level_hint": "L3",
+      "width": 960,
+      "height": 720,
+      "boxes": [
+        {
+          "cls": "person",
+          "conf": 0.7945,
+          "xyxy": [
+            99.7,
+            633.3,
+            179.2,
+            719.7
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.7149,
+          "xyxy": [
+            337.0,
+            622.4,
+            401.9,
+            719.7
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.6167,
+          "xyxy": [
+            831.7,
+            614.0,
+            899.9,
+            719.6
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.5958,
+          "xyxy": [
+            236.4,
+            647.1,
+            291.7,
+            719.7
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.4334,
+          "xyxy": [
+            180.7,
+            631.8,
+            247.9,
+            719.7
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3849,
+          "xyxy": [
+            281.1,
+            622.1,
+            337.9,
+            719.5
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3327,
+          "xyxy": [
+            794.5,
+            632.7,
+            847.9,
+            719.5
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.3273,
+          "xyxy": [
+            0.1,
+            632.1,
+            60.0,
+            719.2
+          ]
+        },
+        {
+          "cls": "clock",
+          "conf": 0.3162,
+          "xyxy": [
+            133.8,
+            0.7,
+            797.2,
+            175.8
+          ]
+        },
+        {
+          "cls": "person",
+          "conf": 0.2679,
+          "xyxy": [
+            45.1,
+            638.2,
+            104.6,
+            719.7
+          ]
+        }
+      ],
+      "risk": 4.4681
+    }
+  ]
+}
